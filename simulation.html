@@ -7,11 +7,178 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* Add Styles Here */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    main {
+      width: 576px;
+      margin: 0 auto;
+    }
+
+    .wrapper{
+      background-color: #f1f1f1;
+      padding: 20px;
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+    }
+
+    .input-wrapper{
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+
+      input {
+        width: calc(100% - 120px);
+        padding: 12px 16px;
+        border: 1px solid #ccc;
+      }
+      button {
+        width: 120px;
+        padding: 10px 20px;
+        color: #fff;
+        background-color: #333;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    }
+
+    .todo-wrapper {
+      list-style: none;
+      padding: 12px 0;
+      li {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid #ccc;
+        cursor: pointer;
+        &:hover {
+          background-color: #f9f9f9;
+        }
+
+        .input-label {
+          display: flex;
+          align-items: baseline;
+          gap: 12px;
+        }
+      }
+    }
+
   </style>
 </head>
 
 <body>
+  <main>
+    <div class="wrapper">
+      <h2>Todo List App</h2>
+      <div class="input-wrapper">
+        <input type="text" placeholder="Enter a todo ." id="input-field" />
+        <button id="btn" onclick="addTodo()">Add</button>
+      </div>
+    </div>
+    <ul id="list-todo" class="todo-wrapper">
+      <!-- <li>
+        <div class="input-label">
+          <input type="checkbox" />
+          <label>Todo 1</label>
+        </div>
+        <span class="close">x</span>
+      </li> -->
+    </ul>
+  </main>
+  <script>
+    const inputField = document.getElementById("input-field");
+    const listTodo = document.getElementById("list-todo");
+  
+    fetch("./data.json")
+      .then(async (res) => {
+        if (!res.ok) {
+          throw new Error
+            (`HTTP error! Status: ${res.status}`);
+        }
+        const data = await res.json();
+        data.map(({ checked, name, id }) => {
+          listTodo.innerHTML += `
+          <li>
+            <div class="input-label">
+              <input
+                type="checkbox"
+                ${checked ? "checked" : ""}
+                onchange="checkedTodo(this)"
+              >
+              <label ${checked ? 'style="text-decoration: line-through"' : ""}>
+                ${name}
+              </label>
+            </div>
+            <span class="close" onclick="removeTodo(this)">x</span>
+          </li>`;
+        });
+      })
+      .catch((error) => {
+        alert("Error: " + JSON.stringify(error));
+      });
+    
+    function addTodo() {
+      const inputValue = inputField.value;
 
+      const li = document.createElement("li");
+      const div = document.createElement("div");
+      const input = document.createElement("input");
+      const label = document.createElement("label");
+      const span = document.createElement("span");
+
+      div.classList.add("input-label");
+      label.innerHTML = inputValue;
+
+      input.type = "checkbox";
+      input.onchange = function () {
+        checkTodo(this);
+      }
+
+      span.innerHTML = "x";
+      span.onclick = function () {
+        removeTodo(this);
+      }
+
+      div.appendChild(input);
+      div.appendChild(label);
+
+      li.appendChild(div);
+      li.appendChild(span);
+
+      listTodo.appendChild(li);
+
+      // listTodo.innerHTML+=`
+      //   <li>
+      //     <div class="input-label">
+      //       <input type="checkbox" checked />
+      //       <label>${inputValue}</label>
+      //     </div>
+      //     <span class="close">x</span>
+      //   </li>
+      // `;
+      inputField.value = "";
+    }
+
+    function removeTodo(el) {
+      el.parentElement.remove();
+    }
+
+    function checkTodo(el) {
+      const label = el.nextElementSibling;
+      if (el.checked) {
+        label.style.textDecoration = "line-through";
+      } else {
+        label.style.textDecoration = "none";
+      }
+    }
+  </script>
 </body>
 </html>
