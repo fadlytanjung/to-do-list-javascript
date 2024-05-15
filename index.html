@@ -1,25 +1,27 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-<head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css" />
-</head>
-
-<body>
-  <main>
-    <div id="wrapper" class="header">
-      <h2>My To Do List</h2>
-      <div class="input-wrapper">
-        <input type="text" id="input-field" placeholder="Title...">
-        <button onclick="addTodo()">Add</button>
+  <body>
+    <main>
+      <div id="wrapper" class="header">
+        <h2>My To Do List (2)</h2>
+        <div class="input-wrapper">
+          <input type="text" id="input-field" placeholder="Title..." />
+          <button onclick="addTodo()">Add</button>
+        </div>
       </div>
-    </div>
-    <ul id="list-todo" class="todo-wrapper">
-      <!-- <li>
+      <ul id="list-todo" class="todo-wrapper">
+        <!-- <li>
         <div class="input-label">
           <input type="checkbox">
           <label>
@@ -28,86 +30,84 @@
         </div>
         <span class="close">x</span>
       </li> -->
-    </ul>
-  </main>
-  <script>
-    const listTodo = document.getElementById("list-todo");
-    const inputElement = document.getElementById("input-field");
-    const wrapper = document.getElementById("wrapper");
+      </ul>
+    </main>
+    <script>
+      const listTodo = document.getElementById("list-todo");
+      const inputElement = document.getElementById("input-field");
+      const wrapper = document.getElementById("wrapper");
 
-    // add new todo item
-    function addTodo(){
-      const inputValue = inputElement.value;
-   
-      if (inputValue.length < 1) {
-        // add error class
-        inputElement.classList.add("error-input");
+      // add new todo item
+      function addTodo() {
+        const inputValue = inputElement.value;
 
-        // create span element error
-        const errorElement = document.createElement('span');
-        // add class error message
-        errorElement.classList.add('error-message');
-        // add text error message
-        errorElement.innerHTML = 'Please enter a todo.';
-        // append error element to wrapper
-        wrapper.appendChild(errorElement);
-        return; // stop the function
+        if (inputValue.length < 1) {
+          // add error class
+          inputElement.classList.add("error-input");
+
+          // create span element error
+          const errorElement = document.createElement("span");
+          // add class error message
+          errorElement.classList.add("error-message");
+          // add text error message
+          errorElement.innerHTML = "Please enter a todo.";
+          // append error element to wrapper
+          wrapper.appendChild(errorElement);
+          return; // stop the function
+        }
+
+        inputElement.classList.remove("error-input");
+        const errorElement = wrapper.querySelector(".error-message");
+
+        if (errorElement) {
+          wrapper.removeChild(errorElement);
+        }
+
+        const li = document.createElement("li");
+        const div = document.createElement("div");
+        const input = document.createElement("input");
+        const label = document.createElement("label");
+        const span = document.createElement("span");
+
+        div.classList.add("input-label");
+        label.innerHTML = inputValue;
+
+        input.type = "checkbox";
+        input.onchange = function () {
+          checkedTodo(this);
+        };
+
+        span.innerHTML = "x";
+        span.classList.add("close");
+        span.onclick = function () {
+          removeTodo(this);
+        };
+
+        div.appendChild(input);
+        div.appendChild(label);
+
+        li.appendChild(div);
+        li.appendChild(span);
+        listTodo.appendChild(li);
+
+        inputElement.value = "";
       }
 
-      inputElement.classList.remove("error-input");
-      const errorElement = wrapper.querySelector('.error-message');
-  
-      if (errorElement) {
-        wrapper.removeChild(errorElement);
+      // remove todo by binding item
+      function removeTodo(elem) {
+        elem.parentElement.remove();
       }
 
-      const li = document.createElement('li');
-      const div = document.createElement('div');
-      const input = document.createElement('input');
-      const label = document.createElement('label');
-      const span = document.createElement('span');
-
-      div.classList.add('input-label');
-      label.innerHTML = inputValue;
-      
-      input.type = 'checkbox';
-      input.onchange = function() {
-        checkedTodo(this);
-      };
-      
-      span.innerHTML = 'x';
-      span.classList.add('close');
-      span.onclick = function() {
-        removeTodo(this);
-      };
-
-      div.appendChild(input);
-      div.appendChild(label);
-      
-      li.appendChild(div);
-      li.appendChild(span);
-      listTodo.appendChild(li);
-
-      inputElement.value = '';
-    };
-
-    // remove todo by binding item
-    function removeTodo(elem) {
-      elem.parentElement.remove();
-    };
-
-    function checkedTodo(elem) {
-      const label = elem.nextElementSibling;
-      if (elem.checked) {
-        elem.checked = "checked";
-        label.style.textDecoration = 'line-through';
-      } else {
-        elem.checked = false;
-        label.style.textDecoration = 'none';
+      function checkedTodo(elem) {
+        const label = elem.nextElementSibling;
+        if (elem.checked) {
+          elem.checked = "checked";
+          label.style.textDecoration = "line-through";
+        } else {
+          elem.checked = false;
+          label.style.textDecoration = "none";
+        }
       }
-    }
-  </script>
-
-</body>
-
+    </script>
+  </body>
 </html>
