@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "name": "Todo 1",
+        "checked": true
+    },
+    {
+        "id": 2,
+        "name": "Todo 2",
+        "checked": false
+    }
+]

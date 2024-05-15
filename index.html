@@ -35,6 +35,36 @@
     const inputElement = document.getElementById("input-field");
     const wrapper = document.getElementById("wrapper");
 
+    fetch("./data.json")
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error
+            (`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        data.map(({ checked, name, id }) => {
+          listTodo.innerHTML += `
+            <li>
+              <div class="input-label">
+                <input
+                  type="checkbox"
+                  ${checked ? "checked" : ""}
+                  onchange="checkedTodo(this)"
+                >
+                <label ${checked ? 'style="text-decoration: line-through"' : ""}>
+                  ${name}
+                </label>
+              </div>
+              <span class="close" onclick="removeTodo(this)">x</span>
+            </li>`;
+        });
+      })
+      .catch((error) => {
+        alert("Error: " + JSON.stringify(error));
+      });
+
     // add new todo item
     function addTodo(){
       const inputValue = inputElement.value;
