@@ -35,7 +35,7 @@
     const inputElement = document.getElementById("input-field");
     const wrapper = document.getElementById("wrapper");
 
-    fetch("./data.json")
+    fetch("./data-tim-11.json")
       .then((res) => {
         if (!res.ok) {
           throw new Error
@@ -44,22 +44,22 @@
         return res.json();
       })
       .then((data) => {
-        data.map(({ checked, name, id }) => {
+        data.slice(0,100).map(({ BOROUGH, ADDRESS }) => {
           listTodo.innerHTML += `
             <li>
               <div class="input-label">
                 <input
                   type="checkbox"
-                  ${checked ? "checked" : ""}
                   onchange="checkedTodo(this)"
                 >
-                <label ${checked ? 'style="text-decoration: line-through"' : ""}>
-                  ${name}
+                <label>
+                  ${BOROUGH} | ${ADDRESS}
                 </label>
               </div>
               <span class="close" onclick="removeTodo(this)">x</span>
             </li>`;
         });
+        // console.log({ data });
       })
       .catch((error) => {
         alert("Error: " + JSON.stringify(error));
