@@ -47,10 +47,10 @@
     const wrapper = document.getElementById("wrapper");
     const dataTable = document.getElementById("data");
 
-    let page = 2;
+    let page = 1;
     let limit = 10;
 
-    fetch("./data/data-tim-12.json")
+    fetch("./data/data-tim-09.json")
       .then((res) => {
         if (!res.ok) {
           throw new Error
@@ -59,8 +59,10 @@
         return res.json();
       })
       .then((data) => {
-        const filteredData = data.filter((el) => el['SALE PRICE'] >= 200000)
-          .sort((a, b) => b['SALE PRICE'] - a['SALE PRICE']);
+        const filteredData = data.filter(
+          (el) => el['SALE PRICE'] >= 200000
+        )
+          .sort((a, b) => a['SALE PRICE'] - b['SALE PRICE']);
   
         let dataBody = "";
 
@@ -70,8 +72,8 @@
               <tr>
                 <td>${i + 1}</td>
                 <td>${filteredData[i].BOROUGH}</td>
-                <td>${filteredData[i].ADDRESS}</td>
-                <td>${filteredData[i].LOT}</td>
+                <td>${filteredData[i].NEIGHBORHOOD}</td>
+                <td>${filteredData[i]['TOTAL UNITS']}</td>
                 <td>${filteredData[i]['SALE PRICE']}</td>
               </tr>
               `;
