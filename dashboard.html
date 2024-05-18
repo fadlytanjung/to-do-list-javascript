@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      padding: 1rem;
+    }
+    .wrapper {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .card {
+      padding: 1rem;
+      border-radius: 8px;
+      min-height: 200px;
+      border: 1px solid #ccc;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+
+      h4 {
+        font-size: 1rem;
+        color: #333;
+
+      }
+
+      h3 {
+        font-size: 2rem;
+        color: blueviolet;
+      }
+    }
+
+    #customers {
+      font-family: Arial, Helvetica, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    table td,
+    table th {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    table tr:hover {
+      background-color: #ddd;
+    }
+
+    table th {
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #04AA6D;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Dashboard</h1>
+  <div class="wrapper">
+    <div class="card">
+      <h4>
+        Total Lot
+      </h4>
+      <h3 id="total-lot">
+        200
+      </h3>
+    </div>
+    <div class="card">
+      <h4>
+        Total Sales Price
+      </h4>
+      <h3 id="total-sales-price">
+        200
+      </h3>
+    </div>
+    <div class="card">
+      3
+    </div>
+  </div>
+  <table style="width: 100%;">
+    <thead>
+      <th>NO</th>
+      <th>BOROUGH</th>
+      <th>ADDRESS</th>
+      <th>LOT</th>
+      <th>SALE PRICE</th>
+      <th>YEAR BUILT</th>
+    </thead>
+    <select name="year" id="year-built" style="margin-bottom: 1rem;" value="sss">
+      <option value="">Select Year Built</option>
+      <option value="2003">2003</option>
+    </select>
+    <tbody id="data-table">
+
+    </tbody>
+  </table>
+  <script>
+    const totalLot = document.getElementById("total-lot");
+    const totalSalesPrice = document.getElementById("total-sales-price");
+    const tableData = document.getElementById("data-table");
+    const yearBuiltOption = document.getElementById("year-built");
+
+    let page = 1;
+    let limit = 10;
+    let year;
+
+    let IDR = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    });
+
+    fetchDataJson(page, limit);
+    yearBuiltOption.addEventListener("change", (e) => {
+      year = e.target.value;
+      fetchDataJson(page, limit, year);
+    });
+
+    function fetchDataJson(page, size, year=""){
+      fetch("./data/data-tim-10.json")
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error
+              (`HTTP error! Status: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          const filteredData = data.filter(
+            (el) => {
+
+              if (year) {
+                return el.YEAR_BUILT === year
+              }
+              return el;
+            }
+          ).sort((a, b) => b.SALE_PRICE - a.SALE_PRICE);
+          const getAllYearBuilt = filteredData.map((el) => el.YEAR_BUILT);
+          const uniqueYearBuilt = [...new Set(getAllYearBuilt)];
+          const convertYearBuiltToNumber = uniqueYearBuilt
+            .map((el) => Number(el))
+            .sort((a, b) => a - b);
+          
+          const optionYearBuilt = convertYearBuiltToNumber
+            .map((el) => `<option value="${el}">${el}</option>`)
+            .join("");
+
+          yearBuiltOption.innerHTML += optionYearBuilt;
+
+          const totalLotData = filteredData.reduce(
+            (acc, curr) => acc + Number(curr.LOT),
+            0,
+          );
+          const totalSalesPriceData = filteredData.reduce(
+            (acc, curr) => acc + Number(curr.SALE_PRICE),
+            0,
+          );
+          
+          const formatTotalLot = totalLotData.toLocaleString();
+          const formatTotalSales = IDR.format(totalSalesPriceData);
+          
+          totalLot.innerHTML = formatTotalLot;
+          totalSalesPrice.innerHTML = formatTotalSales;
+          let dataBody = "";
+          for (let i = 0; i < filteredData.length; i++) {
+            if (i >= (page - 1) * limit && i < limit * page) {
+              data.push(filteredData[i]);
+              dataBody += `
+              <tr>
+                <td>${i + 1}</td>
+                <td>${filteredData[i].BOROUGH}</td>
+                <td>${filteredData[i].ADDRESS}</td>
+                <td>${filteredData[i].LOT}</td>
+                <td>${filteredData[i].SALE_PRICE}</td>
+                <td>${filteredData[i].YEAR_BUILT}</td>
+              </tr>
+              `;
+            }
+          }
+
+          tableData.innerHTML = dataBody;
+        })
+        .catch((error) => {
+          console.log({ error })
+          alert("Error: " + JSON.stringify(error));
+        });
+    }
+    
+  </script>
+
+</body>
+
+</html>
