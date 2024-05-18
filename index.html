@@ -29,13 +29,28 @@
         <span class="close">x</span>
       </li> -->
     </ul>
+    <table style="border-collapse: collapse; width: 100%" border="1">
+      <thead>
+        <th>NO</th>
+        <th>BOROUGH</th>
+        <th>ADDRESS</th>
+        <th>LOT</th>
+        <th>SALE PRICE</th>
+      </thead>
+      <tbody id="data">
+      </tbody>
+    </table>
   </main>
   <script>
     const listTodo = document.getElementById("list-todo");
     const inputElement = document.getElementById("input-field");
     const wrapper = document.getElementById("wrapper");
+    const dataTable = document.getElementById("data");
 
-    fetch("./data-tim-11.json")
+    let page = 2;
+    let limit = 10;
+
+    fetch("./data-tim-12.json")
       .then((res) => {
         if (!res.ok) {
           throw new Error
@@ -44,31 +59,48 @@
         return res.json();
       })
       .then((data) => {
-        data.slice(0,100).map(({ BOROUGH, ADDRESS }) => {
-          listTodo.innerHTML += `
-            <li>
-              <div class="input-label">
-                <input
-                  type="checkbox"
-                  onchange="checkedTodo(this)"
-                >
-                <label>
-                  ${BOROUGH} | ${ADDRESS}
-                </label>
-              </div>
-              <span class="close" onclick="removeTodo(this)">x</span>
-            </li>`;
-        });
-        // console.log({ data });
+        const filteredData = data.filter((el) => el['SALE PRICE'] >= 200000)
+          .sort((a, b) => b['SALE PRICE'] - a['SALE PRICE']);
+  
+        let dataBody = "";
+
+        for (let i = 0; i < filteredData.length; i++) {
+          if (i >= (page - 1) * limit && i < limit * page) {
+            dataBody += `
+              <tr>
+                <td>${i + 1}</td>
+                <td>${filteredData[i].BOROUGH}</td>
+                <td>${filteredData[i].ADDRESS}</td>
+                <td>${filteredData[i].LOT}</td>
+                <td>${filteredData[i]['SALE PRICE']}</td>
+              </tr>
+              `;
+          }
+        }
+        // listTodo.innerHTML += `
+        //   <li>
+        //     <div class="input-label">
+        //       <input
+        //         type="checkbox"
+        //         onchange="checkedTodo(this)"
+        //       >
+        //       <label>
+        //         ${BOROUGH} | ${ADDRESS}
+        //       </label>
+        //     </div>
+        //     <span class="close" onclick="removeTodo(this)">x</span>
+        //   </li>`;
+        dataTable.innerHTML = dataBody;
       })
       .catch((error) => {
+        console.log({ error })
         alert("Error: " + JSON.stringify(error));
       });
 
     // add new todo item
-    function addTodo(){
+    function addTodo() {
       const inputValue = inputElement.value;
-   
+
       if (inputValue.length < 1) {
         // add error class
         inputElement.classList.add("error-input");
@@ -86,7 +118,7 @@
 
       inputElement.classList.remove("error-input");
       const errorElement = wrapper.querySelector('.error-message');
-  
+
       if (errorElement) {
         wrapper.removeChild(errorElement);
       }
@@ -99,21 +131,21 @@
 
       div.classList.add('input-label');
       label.innerHTML = inputValue;
-      
+
       input.type = 'checkbox';
-      input.onchange = function() {
+      input.onchange = function () {
         checkedTodo(this);
       };
-      
+
       span.innerHTML = 'x';
       span.classList.add('close');
-      span.onclick = function() {
+      span.onclick = function () {
         removeTodo(this);
       };
 
       div.appendChild(input);
       div.appendChild(label);
-      
+
       li.appendChild(div);
       li.appendChild(span);
       listTodo.appendChild(li);
