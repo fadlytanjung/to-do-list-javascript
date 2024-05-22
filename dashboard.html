@@ -75,6 +75,7 @@
       color: white;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -100,7 +101,11 @@
       3
     </div>
   </div>
-  <table style="width: 100%;">
+  <div style="width: 700px;">
+    <canvas id="chart-bar"></canvas>
+  </div>
+
+ <table style="width: 100%;">
     <thead>
       <th>NO</th>
       <th>BOROUGH</th>
@@ -124,7 +129,7 @@
     const yearBuiltOption = document.getElementById("year-built");
 
     let page = 1;
-    let limit = 10;
+    let limit = 100;
     let year;
 
     let IDR = new Intl.NumberFormat('en-US', {
@@ -135,10 +140,10 @@
     fetchDataJson(page, limit);
     yearBuiltOption.addEventListener("change", (e) => {
       year = e.target.value;
-      fetchDataJson(page, limit, year);
+      fetchDataJson(page, limit, year, false);
     });
 
-    function fetchDataJson(page, size, year=""){
+    function fetchDataJson(page, size, year="", render=true){
       fetch("./data/data-tim-10.json")
         .then((res) => {
           if (!res.ok) {
@@ -148,7 +153,7 @@
           return res.json();
         })
         .then((data) => {
-          const filteredData = data.filter(
+          const filteredData = data.slice((page-1)*limit, limit*page).filter(
             (el) => {
 
               if (year) {
@@ -157,6 +162,7 @@
               return el;
             }
           ).sort((a, b) => b.SALE_PRICE - a.SALE_PRICE);
+
           const getAllYearBuilt = filteredData.map((el) => el.YEAR_BUILT);
           const uniqueYearBuilt = [...new Set(getAllYearBuilt)];
           const convertYearBuiltToNumber = uniqueYearBuilt
@@ -167,7 +173,9 @@
             .map((el) => `<option value="${el}">${el}</option>`)
             .join("");
 
-          yearBuiltOption.innerHTML += optionYearBuilt;
+          if (render){
+            yearBuiltOption.innerHTML += optionYearBuilt;
+          }
 
           const totalLotData = filteredData.reduce(
             (acc, curr) => acc + Number(curr.LOT),
@@ -201,10 +209,45 @@
           }
 
           tableData.innerHTML = dataBody;
+
+          // render chart-bar
+          const mappingChartBarData = {} // { 2005: 100, 2006: 300 }
+
+          for (let i = 0; i < filteredData.length; i++) {
+            if (!mappingChartBarData[filteredData[i].YEAR_BUILT]) {
+              mappingChartBarData[filteredData[i].YEAR_BUILT] = Number(filteredData[i].LOT);
+            } else {
+              mappingChartBarData[filteredData[i].YEAR_BUILT] += Number(filteredData[i].LOT);
+            }
+          }
+
+          const labelChartBar = Object.keys(mappingChartBarData);
+          const dataChartBar = Object.values(mappingChartBarData);
+          
+          // render data to chart-bar
+          const ctx = document.getElementById("chart-bar");
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labelChartBar,
+              datasets: [{
+                label: '# LOT per Year',
+                data: dataChartBar,
+                borderWidth: 1
+              }]
+            },
+            options: {
+              scales: {
+                y: {
+                  beginAtZero: true
+                }
+              }
+            }
+          });
         })
         .catch((error) => {
           console.log({ error })
-          alert("Error: " + JSON.stringify(error));
+          // alert("Error: " + JSON.stringify(error));
         });
     }
     
