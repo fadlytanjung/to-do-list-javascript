@@ -17,6 +17,7 @@
     body {
       padding: 1rem;
     }
+
     .wrapper {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -104,22 +105,30 @@
   <select name="year" id="year" style="margin-bottom: 1rem;">
     <option value="">Select Year Built</option>
   </select>
-  <div
-    style="width: 700px; display: flex; justify-content: space-between;"
-    id="wrapper-chart"
-  >
+  <div style="width: 700px; display: flex; justify-content: space-between; flex-wrap: wrap;" id="wrapper-chart"
+    class="wrapper-chart">
     <canvas id="bar-chart"></canvas>
-    <canvas id="pie-chart"></canvas>
+    <canvas id="pie-chart" width="300" height="300"></canvas>
+    <canvas id="line-chart" width="300" height="300"></canvas>
   </div>
 
- <table style="width: 100%;">
+
+  <div>
+    <label>Sort by Sales Price : </label>
+    <select name="sort" id="sort-data-table-sales-price" style="margin-top: 1rem; margin-bottom: 0.5rem;">
+      <option value="">Sort Data</option>
+      <option value="asc">Ascending</option>
+      <option value="desc">Descending</option>
+    </select>
+  </div>
+  <table style="width: 100%;">
     <thead>
       <th>NO</th>
       <th>BOROUGH</th>
-      <th>ADDRESS</th>
+      <th>NEIGHBORHOOD</th>
       <th>LOT</th>
       <th>SALE PRICE</th>
-      <th>YEAR BUILT</th>
+      <th>SALE DATE</th>
     </thead>
     <tbody id="data-table">
 
